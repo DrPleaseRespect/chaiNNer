@@ -20,6 +20,11 @@ from utils.onnx_model import OnnxModel
 from utils.torch_types import PyTorchModel
 from utils.pytorch_model_loading import load_state_dict
 
+major_version = 1
+minor_version = 0
+revision_version = 0
+version = F"{major_version}.{minor_version}.{revision_version}"
+
 class Timer:
     def __init__(self) -> None:
         self._start_time = time.time()
@@ -163,31 +168,34 @@ def Convert(model: str, directory: str, name: str, fp16=False):
     print(F"PTH2NCNN Conversion Completed! in {timer.elapsed}")
 
 
-def pth2ncnn_compatibility(model: str, fp16=False):
+def pth2ncnn_compatibility(model: str, fp16=False, directory: str = None):
     timer = Timer()
     print("Running PTH2NCNN Compatibility Mode - PTH2NCNN ChaiNNer Edition")
     model_name = pathlib.Path(model).resolve().stem
     model: PyTorchModel = LoadTorchModel(model, fp16)
     model_scale = model.scale
-    SaveTorchToNCNN(model, (pathlib.Path().resolve() / model_name), f"x{str(model_scale)}")
+    path = (pathlib.Path() / model_name) if directory is None else pathlib.Path(directory)
+    SaveTorchToNCNN(model, str(path), f"x{str(model_scale)}")
     print(F"PTH2NCNN Conversion Completed! in {timer.elapsed}")
 
 if "__main__" == __name__:
     import argparse
     parser = argparse.ArgumentParser(
-        prog="PTH2NCNN - ChaiNNer Edition",
+        prog=F"PTH2NCNN - ChaiNNer Edition",
         description="Code from ChaiNNer. Modified by DrPleaseRespect to Replace PTH2NCNN",
-        epilog="ChaiNNer: https://github.com/chaiNNer-org/chaiNNer DrPleaseRespect: https://github.com/DrPleaseRespect"
+        epilog="ChaiNNer: https://github.com/chaiNNer-org/chaiNNer DrPleaseRespect: https://github.com/DrPleaseRespect "
     )
     parser.add_argument("model")
+    parser.add_argument("outpath", required=False, default=None)
     parser.add_argument('--full', action='store_true', help='Use 32bit precision instead of 16bit')
+    parser.add_argument("--version", action='version', version=f'%(prog)s {version}')
     args = parser.parse_args()
 
     if not os.path.exists(args.model):
         print('Error: Model [{:s}] does not exist.'.format(args.model))
         sys.exit(1)
 
-    pth2ncnn_compatibility(args.model, args.full)
+    pth2ncnn_compatibility(args.model, args.full, args.outpath)
 
 
 
