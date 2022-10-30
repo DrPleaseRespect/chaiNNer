@@ -42,9 +42,6 @@ class Timer:
     def elapsed(self):
         return self.get_elapsed(2)
 
-
-
-
 def LoadTorchModel(path, fp16=False) -> PyTorchModel:
         """Read a pth file from the specified path and return it as a state dict
         and loaded model after finding arch config"""
@@ -112,7 +109,7 @@ def TorchToONNX(model: PyTorchModel, fp16=False) -> OnnxModel:
             model,
             dummy_input,
             f,
-            opset_version=14,
+            opset_version=11,
             verbose=False,
             input_names=["data"],
             output_names=["output"],
@@ -186,7 +183,7 @@ if "__main__" == __name__:
         epilog="ChaiNNer: https://github.com/chaiNNer-org/chaiNNer DrPleaseRespect: https://github.com/DrPleaseRespect "
     )
     parser.add_argument("model")
-    parser.add_argument("outpath", required=False, default=None)
+    parser.add_argument("-o", "--outpath", required=False, default=None)
     parser.add_argument('--full', action='store_true', help='Use 32bit precision instead of 16bit')
     parser.add_argument("--version", action='version', version=f'%(prog)s {version}')
     args = parser.parse_args()
