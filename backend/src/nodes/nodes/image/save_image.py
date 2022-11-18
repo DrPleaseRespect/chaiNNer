@@ -11,7 +11,7 @@ from PIL import Image
 from sanic.log import logger
 
 from . import category as ImageCategory
-from ...node_base import NodeBase
+from ...node_base import NodeBase, group
 from ...node_factory import NodeFactory
 from ...properties.inputs import (
     ImageInput,
@@ -34,9 +34,15 @@ class ImWriteNode(NodeBase):
             DirectoryInput(has_handle=True),
             TextInput("Subdirectory Path").make_optional(),
             TextInput("Image Name"),
-            ImageExtensionDropdown(),
-            SliderInput(
-                "Quality (JPEG/WEBP)", minimum=0, maximum=100, default=95, slider_step=1
+            group("conditional-enum", {"conditions": {5: ["jpg", "webp"]}})(
+                ImageExtensionDropdown(),
+                SliderInput(
+                    "Quality",
+                    minimum=0,
+                    maximum=100,
+                    default=95,
+                    slider_step=1,
+                ).with_id(5),
             ),
         ]
         self.category = ImageCategory
@@ -58,6 +64,11 @@ class ImWriteNode(NodeBase):
     ) -> None:
         """Write an image to the specified path and return write status"""
 
+        lossless = False
+        if extension == "webp-lossless":
+            extension = "webp"
+            lossless = True
+
         full_file = f"{filename}.{extension}"
         if relative_path and relative_path != ".":
             base_directory = os.path.join(base_directory, relative_path)
@@ -70,7 +81,7 @@ class ImWriteNode(NodeBase):
 
         os.makedirs(base_directory, exist_ok=True)
         # Any image not supported by cv2, will be handled by pillow.
-        if extension not in ["png", "jpg", "gif", "tiff", "webp"]:
+        if extension not in ["png", "jpg", "tiff", "webp"]:
             channels = get_h_w_c(img)[2]
             if channels == 1:
                 # PIL supports grayscale images just fine, so we don't need to do any conversion
@@ -90,7 +101,7 @@ class ImWriteNode(NodeBase):
             if extension == "jpg":
                 params = [cv2.IMWRITE_JPEG_QUALITY, quality]
             elif extension == "webp":
-                params = [cv2.IMWRITE_WEBP_QUALITY, quality]
+                params = [cv2.IMWRITE_WEBP_QUALITY, 101 if lossless else quality]
             else:
                 params = []
 

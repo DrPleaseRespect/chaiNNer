@@ -4,6 +4,8 @@ import cv2
 from ...utils.image_utils import BorderType
 from ...utils.pil_utils import InterpolationMethod, RotateExpandCrop
 from ...utils.tile_util import TileMode
+from ...utils.height import HeightSource
+from ...utils.edge_filter import EdgeFilters
 from ...utils.color.convert_data import color_spaces, color_spaces_or_detectors
 from ..expression import named
 from .generic_inputs import DropDownInput
@@ -312,6 +314,134 @@ def CaptionPositionInput() -> DropDownInput:
             {
                 "option": "Top",
                 "value": "top",
+            },
+        ],
+    )
+
+
+def EdgeFilterInput() -> DropDownInput:
+    return DropDownInput(
+        input_type="EdgeFilter",
+        label="Filter",
+        options=[
+            {
+                "option": "Sobel (dUdV) (3x3)",
+                "value": EdgeFilters.Sobel,
+            },
+            {
+                "option": "Sobel-like (5x5)",
+                "value": EdgeFilters.SobelLike5,
+            },
+            {
+                "option": "Sobel-like (7x7)",
+                "value": EdgeFilters.SobelLike7,
+            },
+            {
+                "option": "Sobel-like (9x9)",
+                "value": EdgeFilters.SobelLike9,
+            },
+            {
+                "option": "Prewitt (3x3)",
+                "value": EdgeFilters.Prewitt,
+            },
+            {
+                "option": "Scharr (3x3)",
+                "value": EdgeFilters.Scharr,
+            },
+            {
+                "option": "4 Sample (1x3)",
+                "value": EdgeFilters.FourSample,
+            },
+        ],
+    )
+
+
+def HeightMapSourceInput() -> DropDownInput:
+    return DropDownInput(
+        input_type="HeightMapSource",
+        label="Height Source",
+        options=[
+            {
+                "option": "Average RGB",
+                "value": HeightSource.AVG_RGB,
+            },
+            {
+                "option": "Max RGB",
+                "value": HeightSource.MAX_RGB,
+            },
+            {
+                "option": "Screen RGB",
+                "value": HeightSource.SCREEN_RGB,
+            },
+            {
+                "option": "Alpha",
+                "value": HeightSource.A,
+            },
+            {
+                "option": "Red",
+                "value": HeightSource.R,
+            },
+            {
+                "option": "Green",
+                "value": HeightSource.G,
+            },
+            {
+                "option": "Blue",
+                "value": HeightSource.B,
+            },
+        ],
+    )
+
+
+def NormalChannelInvertInput() -> DropDownInput:
+    return DropDownInput(
+        input_type="NormalChannelInvert",
+        label="Invert",
+        options=[
+            {
+                "option": "None",
+                "value": 0,
+            },
+            {
+                "option": "Invert R",
+                "value": 1,
+            },
+            {
+                "option": "Invert G",
+                "value": 2,
+            },
+            {
+                "option": "Invert R and G",
+                "value": 3,
+            },
+        ],
+    )
+
+
+def NormalMappingAlphaInput() -> DropDownInput:
+    return DropDownInput(
+        input_type="NormalMappingAlpha",
+        label="Alpha Channel",
+        options=[
+            {
+                "option": "None",
+                "value": "none",
+                "type": "NormalMappingAlpha::None",
+            },
+            {
+                "option": "Unchanged",
+                "value": "unchanged",
+                "type": "NormalMappingAlpha::Unchanged",
+            },
+            {
+                "option": "Height",
+                "value": "height",
+                "type": "NormalMappingAlpha::Height",
+            },
+            {
+                "option": "Set to 1",
+                "value": "one",
+                "type": "NormalMappingAlpha::One",
             },
         ],
     )

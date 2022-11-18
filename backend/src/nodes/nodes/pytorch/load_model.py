@@ -24,8 +24,8 @@ class LoadModelNode(NodeBase):
         self.description = """Load PyTorch state dict file (.pth) into an auto-detected supported model architecture.
             Supports most variations of the RRDB architecture
             (ESRGAN, Real-ESRGAN, RealSR, BSRGAN, SPSR),
-            Real-ESRGAN's SRVGG architecture, Swift-SRGAN, and SwinIR."""
-        self.inputs = [PthFileInput()]
+            Real-ESRGAN's SRVGG architecture, Swift-SRGAN, SwinIR, Swin2SR, and HAT."""
+        self.inputs = [PthFileInput(primary_input=True)]
         self.outputs = [
             ModelOutput(kind="pytorch", should_broadcast=True),
             DirectoryOutput("Model Directory").with_id(2),
@@ -50,14 +50,14 @@ class LoadModelNode(NodeBase):
         try:
             logger.debug(f"Reading state dict from path: {path}")
             state_dict = torch.load(
-                path, map_location=torch.device(exec_options.device)
+                path, map_location=torch.device(exec_options.full_device)
             )
             model = load_state_dict(state_dict)
 
             for _, v in model.named_parameters():
                 v.requires_grad = False
             model.eval()
-            model = model.to(torch.device(exec_options.device))
+            model = model.to(torch.device(exec_options.full_device))
             should_use_fp16 = exec_options.fp16 and model.supports_fp16
             if should_use_fp16:
                 model = model.half()

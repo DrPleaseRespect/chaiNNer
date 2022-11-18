@@ -1,5 +1,6 @@
 appdirs
 black
+einops
 facexlib
 ffmpeg-python
 ncnn_vulkan
@@ -17,5 +18,5 @@ pytest
 pywin32 ; sys_platform=="win32"
 sanic
 sanic_cors
-torch
-torchvision
+# torch
+# torchvision
